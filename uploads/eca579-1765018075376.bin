@@ -1,0 +1,52 @@
+/*
+Wm: https://whatsapp.com/channel/0029VaF9C4zId7nOTFF8ZK0v
+Jgn hapus wm ku
+Fitur:  Name Bot Image
+Type : case
+Api: https://api.nekolabs.my.id/
+*Note:* Ganti djimg dengan nama bot kalian (namebot)img+Sesuaikan dengan bot kalian 
+*/
+
+case'djimg': {
+
+    try {
+  const sizeList = {
+    '1:1': '1024x1024',
+    '16:9': '1080x720',
+    '9:16': '720x1080',
+    '3:2': '768x521',
+    '2:3': '521x768',
+  }
+
+  if (!text.includes('|')) return m.reply(`
+📸 *Ai Image Generator*
+
+📝 *Cara Pakai:*
+.djimg <prompt>|<size>
+
+📌 *Contoh:*
+.djimg kucing lucu di luar angkasa|1:1
+
+📐 *Ukuran:*
+${Object.entries(sizeList).map(([k, v]) => `- ${k} (${v})`).join('\n')}
+`.trim())
+
+  const [rawPrompt, rawSize] = text.split('|').map(v => v.trim())
+  const prompt = rawPrompt
+  const size = rawSize
+
+  if (!sizeList[size]) return m.reply(`❌ Ukuran *${size}* tidak tersedia.\n\nUkuran tersedia: ${Object.keys(sizeList).join(', ')}`)
+        const result = (await axios.get(`https://api.nekolabs.my.id/image-generation/ai4chat?prompt=${encodeURIComponent(text)}&ratio=${encodeURIComponent(size)}`)).data.result
+  await conn.sendMessage(m.chat, {
+    react: {
+      text: '⏳',
+      key: m.key
+    }
+  })
+  await conn.sendMessage(m.chat, { image: { url: result }, caption: `🖼️ *Gambar Berhasil Dibuat!*\n\n📌 Prompt: ${prompt}\n📐 Ukuran: ${size}` }, { quoted: m })
+
+  } catch (e) {
+    m.reply(e.message)
+  }
+  }
+break
